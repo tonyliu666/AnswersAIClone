@@ -5,6 +5,11 @@ import (
 	"log"
 	"os/exec"
 	"runtime"
+
+	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/app"
+	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/widget"
 )
 
 // Check if Docker is installed by running "docker --version"
@@ -57,4 +62,36 @@ func main() {
 		}
 		fmt.Println("Docker installed successfully")
 	}
+
+	myApp := app.New()
+	myWindow := myApp.NewWindow("Container Dashboard")
+
+	// Sidebar buttons
+	sidebar := container.NewVBox(
+		widget.NewButton("Containers", nil),
+		widget.NewButton("Images", nil),
+		widget.NewButton("Volumes", nil),
+	)
+
+	// Example container list
+	containerList := widget.NewTable(
+		func() (int, int) { return 5, 4 },
+		func() fyne.CanvasObject { return widget.NewLabel("Placeholder") },
+		func(id widget.TableCellID, obj fyne.CanvasObject) {
+			if id.Col == 0 {
+				obj.(*widget.Label).SetText("Container Name")
+			} else if id.Col == 1 {
+				obj.(*widget.Label).SetText("Image")
+			} else if id.Col == 2 {
+				obj.(*widget.Label).SetText("Status")
+			} else {
+				obj.(*widget.Label).SetText("Actions")
+			}
+		})
+
+	// Main content layout
+	content := container.NewBorder(nil, nil, sidebar, nil, containerList)
+
+	myWindow.SetContent(content)
+	myWindow.ShowAndRun()
 }
